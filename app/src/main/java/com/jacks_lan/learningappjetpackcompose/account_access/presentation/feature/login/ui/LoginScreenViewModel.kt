@@ -39,6 +39,24 @@ class LoginViewModel @Inject constructor(
                 _state.update { it.copy(password = event.password) }
             }
 
+            is LoginEvent.OnAuthSuccess -> {
+                _state.value = _state.value.copy(isLoading = false)
+                sendEffect(LoginEffect.NavigateToHome)
+            }
+
+            is LoginEvent.OnAuthError -> {
+                _state.value = _state.value.copy(
+                    isLoading = false,
+                    isError = true,
+                    errorMessage = event.message
+                )
+                sendEffect(LoginEffect.ShowError(event.message))
+            }
+
+            is LoginEvent.OnAuthenticateClicked -> {
+                _state.value = _state.value.copy(isLoading = true)
+            }
+
             LoginEvent.LoginClicked -> {
                 login()
             }
@@ -83,6 +101,12 @@ class LoginViewModel @Inject constructor(
                     )
                 )
             }
+        }
+    }
+
+    private fun sendEffect(effect: LoginEffect) {
+        viewModelScope.launch {
+            _effect.send(effect)
         }
     }
 }

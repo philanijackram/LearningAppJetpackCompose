@@ -21,4 +21,7 @@ sealed class LoginEvent {
     object LoginClicked : LoginEvent()
     data class EmailChanged(val email: String) : LoginEvent()
     data class PasswordChanged(val password: String) : LoginEvent()
+    data object OnAuthenticateClicked : LoginEvent()
+    data object OnAuthSuccess : LoginEvent()
+    data class OnAuthError(val message: String) : LoginEvent()
 }

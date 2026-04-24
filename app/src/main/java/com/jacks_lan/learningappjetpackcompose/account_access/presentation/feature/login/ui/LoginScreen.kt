@@ -1,6 +1,8 @@
 package com.jacks_lan.learningappjetpackcompose.account_access.presentation.feature.login.ui
 
+import android.os.Build
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -15,14 +17,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.fragment.app.FragmentActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jacks_lan.learningappjetpackcompose.account_access.presentation.feature.login.state.LoginEffect
 import com.jacks_lan.learningappjetpackcompose.account_access.presentation.feature.login.state.LoginEvent
+import com.jacks_lan.learningappjetpackcompose.account_access.utils.BiometricManager
 
+@RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
@@ -30,8 +36,9 @@ fun LoginScreen(
 ) {
 
     val state by viewModel.state.collectAsState()
-
     val context = LocalContext.current
+    val activity = LocalContext.current as FragmentActivity
+    val biometricManager = remember { BiometricManager() }
 
     // EFFECT HANDLER
     LaunchedEffect(Unit) {
@@ -90,6 +97,26 @@ fun LoginScreen(
         ) {
             Text("Login")
         }
+
+        Button(
+            onClick = {
+                viewModel.onEvent(LoginEvent.OnAuthenticateClicked)
+
+                biometricManager.authenticate(
+                    activity = activity,
+                    onSuccess = {
+                        viewModel.onEvent(LoginEvent.OnAuthSuccess)
+                    },
+                    onError = {
+                        viewModel.onEvent(LoginEvent.OnAuthError(it))
+                    }
+                )
+            }
+        ) {
+            Text("Authenticate")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         if (state.isLoading) {
             CircularProgressIndicator()
