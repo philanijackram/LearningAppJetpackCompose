@@ -18,7 +18,7 @@ object AccountAccessModule {
     @Provides
     fun provideAuthApi(): AccountAccessApi {
         return Retrofit.Builder()
-            .baseUrl("https://d330-41-114-21-147.ngrok-free.app/")
+            .baseUrl("https://9c56-41-116-31-192.ngrok-free.app/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(AccountAccessApi::class.java)
